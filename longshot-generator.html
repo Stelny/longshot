@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rizz Helper by Kvasa</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            min-height: 100vh;
+            background: #0a0a0a;
+            color: #fff;
+            font-family: 'Inter', system-ui, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 24px;
+            text-align: center;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 40px rgba(131, 58, 180, 0.3);
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 4px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 48px;
+            font-weight: 500;
+        }
+
+        .message-card {
+            width: 100%;
+            min-height: 120px;
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 20px;
+            padding: 28px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            position: relative;
+            transition: border-color 0.3s;
+        }
+
+        .message-card.active {
+            border-color: rgba(131, 58, 180, 0.5);
+            background: linear-gradient(135deg, rgba(131,58,180,0.08), rgba(253,29,29,0.08));
+        }
+
+        .message-text {
+            font-size: 18px;
+            font-weight: 500;
+            line-height: 1.6;
+            color: #eee;
+            transition: opacity 0.2s;
+        }
+
+        .message-text.placeholder {
+            color: #333;
+            font-size: 15px;
+            font-weight: 400;
+        }
+
+        .message-text.fade {
+            opacity: 0;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .generate-btn {
+            flex: 1;
+            padding: 16px;
+            background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045);
+            border: none;
+            border-radius: 16px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.15s, opacity 0.15s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .generate-btn:hover { transform: scale(1.02); }
+        .generate-btn:active { transform: scale(0.98); opacity: 0.9; }
+
+        .copy-btn {
+            padding: 16px 20px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 16px;
+            color: #888;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+        }
+
+        .copy-btn:hover { background: #222; color: #ccc; border-color: #444; }
+        .copy-btn.copied { color: #4ade80; border-color: rgba(74,222,128,0.4); }
+        .copy-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        .counter {
+            margin-top: 24px;
+            font-size: 12px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .history {
+            width: 100%;
+            margin-top: 32px;
+            max-height: 200px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .history::-webkit-scrollbar { width: 0; }
+
+        .history-item {
+            width: 100%;
+            padding: 12px 16px;
+            background: #0d0d0d;
+            border: 1px solid #1a1a1a;
+            border-radius: 12px;
+            font-size: 13px;
+            color: #555;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.15s;
+            line-height: 1.4;
+        }
+
+        .history-item:hover {
+            background: #111;
+            color: #888;
+            border-color: #2a2a2a;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-in {
+            animation: slideUp 0.3s ease-out;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="logo">&#127919;</div>
+    <h1>Rizz Helper by Kvasa</h1>
+    <div class="subtitle">long-shot DM generator pro Instagram</div>
+
+    <div class="message-card" id="card">
+        <div class="message-text placeholder" id="messageText">Klikni na tlacitko a dostanes nahodnou long-shot zpravu</div>
+    </div>
+
+    <div class="btn-row">
+        <button class="generate-btn" id="generateBtn">&#128293; Generovat longshot</button>
+        <button class="copy-btn" id="copyBtn" disabled>&#128203;</button>
+    </div>
+
+    <div class="counter" id="counter"></div>
+
+    <div class="history" id="history"></div>
+</div>
+
+<script>
+    var messages = [
+        "Je to trochu longshot, ale nesla bys na rande?",
+        "Ok, mozna longshot\u2026 ale co rande?",
+        "Vim, ze je to longshot, ale musim to zkusit \u2013 rande?",
+        "Tohle je asi longshot, ale nesla bys nekdy ven?",
+        "Mozna uplny longshot, ale co kdybych te pozval na rande?",
+        "Je to longshot, ale prijdes mi zajimava \u2013 rande?",
+        "Longshot jak blazen, ale zkusim to \u2013 dame rande?",
+        "Je to trochu longshot, ale myslim, ze bychom si sedli \u2013 rande?",
+        "Asi longshot, ale nechces zajit na kafe?",
+        "Ok, jdu all-in \u2013 longshot, ale rande?",
+        "Je to longshot, ale libis se mi \u2013 nesla bys ven?",
+        "Mozna longshot, ale zkusim stesti \u2013 rande?",
+        "Longshot vibes, ale stalo by to za to \u2013 rande?",
+        "Je to trochu longshot, ale prijdes mi fajn \u2013 co rande?",
+        "Longshot, ale mel bych vycitky to nezkusit \u2013 rande?",
+        "Je to longshot, ale nechces jit na drink?",
+        "Longshot incoming\u2026 rande?",
+        "Mozna longshot, ale risknu to \u2013 zajdeme ven?",
+        "Je to longshot, ale pusobis jako nekdo, koho chci poznat \u2013 rande?",
+        "Asi longshot, ale co kdybych te pozval na veceri?",
+        "Longshot, ale treba to vyjde \u2013 rande?",
+        "Je to trochu longshot, ale mas vibe na dobry rande",
+        "Longshot, ale zkusim stesti \u2013 dame kafe?",
+        "Ok, longshot moment \u2013 nesla bys nekdy ven?",
+        "Je to longshot, ale prislo by mi skoda se nezeptat \u2013 rande?",
+        "Longshot, ale co kdybychom to zkusili? rande",
+        "Mozna longshot, ale prijdes mi zajimava \u2013 zajdeme ven?",
+        "Je to trochu longshot, ale myslim, ze bych te rad poznal \u2013 rande?",
+        "Longshot, ale worth it \u2013 rande?",
+        "Je to longshot, ale\u2026 nechces to zjistit na rande?"
+    ];
+
+    var currentMessage = '';
+    var usedIndexes = [];
+    var generateCount = 0;
+
+    var messageText = document.getElementById('messageText');
+    var card = document.getElementById('card');
+    var generateBtn = document.getElementById('generateBtn');
+    var copyBtn = document.getElementById('copyBtn');
+    var counter = document.getElementById('counter');
+    var history = document.getElementById('history');
+
+    function getRandomMessage() {
+        if (usedIndexes.length >= messages.length) {
+            usedIndexes = [];
+        }
+
+        var idx;
+        do {
+            idx = Math.floor(Math.random() * messages.length);
+        } while (usedIndexes.indexOf(idx) !== -1);
+
+        usedIndexes.push(idx);
+        return messages[idx];
+    }
+
+    generateBtn.addEventListener('click', function() {
+        messageText.classList.add('fade');
+
+        setTimeout(function() {
+            currentMessage = getRandomMessage();
+            generateCount++;
+
+            messageText.textContent = currentMessage;
+            messageText.classList.remove('placeholder', 'fade');
+            messageText.classList.add('animate-in');
+            card.classList.add('active');
+
+            copyBtn.disabled = false;
+
+            counter.textContent = generateCount + ' / ' + messages.length + ' vygenerovano';
+
+            // Add to history
+            var item = document.createElement('div');
+            item.className = 'history-item animate-in';
+            item.textContent = currentMessage;
+            item.addEventListener('click', function() {
+                navigator.clipboard.writeText(this.textContent).then(function() {
+                    item.style.color = '#4ade80';
+                    item.style.borderColor = 'rgba(74,222,128,0.3)';
+                    setTimeout(function() {
+                        item.style.color = '';
+                        item.style.borderColor = '';
+                    }, 1500);
+                });
+            });
+            history.insertBefore(item, history.firstChild);
+
+            setTimeout(function() {
+                messageText.classList.remove('animate-in');
+            }, 300);
+        }, 200);
+    });
+
+    copyBtn.addEventListener('click', function() {
+        if (!currentMessage) return;
+
+        navigator.clipboard.writeText(currentMessage).then(function() {
+            copyBtn.textContent = '\u2713';
+            copyBtn.classList.add('copied');
+            setTimeout(function() {
+                copyBtn.textContent = '\u{1F4CB}';
+                copyBtn.classList.remove('copied');
+            }, 2000);
+        });
+    });
+</script>
+
+</body>
+</html>

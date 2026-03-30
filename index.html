@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hagi a síba</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #0a0a0a;
+            color: #fff;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            overflow: hidden;
+        }
+
+        h1 {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 300;
+            margin-bottom: 3rem;
+            text-align: center;
+            color: #aaa;
+            letter-spacing: 0.05em;
+        }
+
+        .timer {
+            font-size: clamp(5rem, 20vw, 12rem);
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            transition: color 0.2s;
+        }
+
+        .timer.resetting {
+            color: #ff4444;
+            animation: shake 0.3s ease-in-out;
+        }
+
+        .timer:not(.resetting) {
+            color: #4ade80;
+        }
+
+        .label {
+            margin-top: 2rem;
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .progress-bar {
+            width: min(80vw, 500px);
+            height: 6px;
+            background: #222;
+            border-radius: 3px;
+            margin-top: 3rem;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #4ade80;
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.05s linear, background-color 0.2s;
+        }
+
+        .progress-fill.resetting {
+            background: #ff4444;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+    </style>
+</head>
+<body>
+    <h1>Jak dlouho si Hagi nedal síbu</h1>
+    <div class="timer" id="timer">0.00</div>
+    <div class="label">sekund</div>
+    <div class="progress-bar">
+        <div class="progress-fill" id="progress"></div>
+    </div>
+
+    <script>
+        const timerEl = document.getElementById('timer');
+        const progressEl = document.getElementById('progress');
+        const LIMIT = 3000;
+        let start = performance.now();
+
+        function update() {
+            const elapsed = performance.now() - start;
+
+            if (elapsed >= LIMIT) {
+                timerEl.textContent = '0.00';
+                timerEl.classList.add('resetting');
+                progressEl.classList.add('resetting');
+                progressEl.style.width = '0%';
+
+                setTimeout(() => {
+                    timerEl.classList.remove('resetting');
+                    progressEl.classList.remove('resetting');
+                }, 300);
+
+                start = performance.now();
+            } else {
+                const seconds = (elapsed / 1000).toFixed(2);
+                timerEl.textContent = seconds;
+                progressEl.style.width = (elapsed / LIMIT * 100) + '%';
+            }
+
+            requestAnimationFrame(update);
+        }
+
+        requestAnimationFrame(update);
+    </script>
+</body>
+</html>
